@@ -121,6 +121,7 @@ model User {
   email     String    @unique
   name      String?
   image     String?
+   phone    String?
   addresses Address[]
   orders    Order[]
   carts     Cart[]
