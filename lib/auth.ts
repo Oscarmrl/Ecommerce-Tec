@@ -6,15 +6,13 @@ import { compare, hash } from "bcryptjs";
 import { prisma } from "./prisma";
 import { z } from "zod";
 
-type NextAuthOptions = Parameters<typeof NextAuth>[0];
-
 // Schema de validación para credenciales
 const credentialsSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
 });
 
-export const authOptions: NextAuthOptions = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
@@ -102,7 +100,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ token, session }: any) {
+    async session({ session, token }: any) {
       if (token) {
         session.user.id = token.id as string;
         session.user.name = token.name as string;
@@ -136,4 +134,4 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
-};
+});
