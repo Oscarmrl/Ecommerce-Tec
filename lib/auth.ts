@@ -2,19 +2,27 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { compare } from "bcryptjs";
+import { compare, hash } from "bcryptjs";
 import { prisma } from "./prisma";
+import { z } from "zod";
 
 type NextAuthOptions = Parameters<typeof NextAuth>[0];
+
+// Schema de validación para credenciales
+const credentialsSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+});
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 días
   },
   pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
+    signIn: "/login",
+    error: "/login",
   },
   providers: [
     GoogleProvider({
@@ -25,33 +33,71 @@ export const authOptions: NextAuthOptions = {
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        password: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Email y contraseña son requeridos");
+          }
 
-        const user = await prisma.user.findUnique({
-          where: {
+          const validatedCredentials = credentialsSchema.safeParse({
             email: credentials.email,
-          },
-        });
+            password: credentials.password,
+          });
 
-        if (!user) {
+          if (!validatedCredentials.success) {
+            throw new Error("Credenciales inválidas");
+          }
+
+          const { email, password } = validatedCredentials.data;
+
+          // Buscar usuario por email
+          const user = await prisma.user.findUnique({
+            where: { email },
+          });
+
+          if (!user) {
+            // Crear nuevo usuario si no existe (registro automático)
+            const hashedPassword = await hash(password, 12);
+            const newUser = await prisma.user.create({
+              data: {
+                email,
+                name: email.split("@")[0], // Nombre por defecto
+                password: hashedPassword,
+              },
+            });
+            return {
+              id: newUser.id,
+              email: newUser.email,
+              name: newUser.name,
+              image: newUser.image,
+            };
+          }
+
+          // Verificar si el usuario tiene contraseña (creado con credenciales)
+          if (!user.password) {
+            // Usuario creado con Google, no puede iniciar con contraseña
+            throw new Error("Este email está registrado con Google. Usa Google para iniciar sesión.");
+          }
+
+          // Verificar contraseña
+          const isValidPassword = await compare(password, user.password);
+          
+          if (!isValidPassword) {
+            throw new Error("Contraseña incorrecta");
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+          };
+        } catch (error) {
+          console.error("Error en autorización:", error);
           return null;
         }
-
-        // En un proyecto real, aquí verificarías la contraseña hasheada
-        // const isPasswordValid = await compare(credentials.password, user.password);
-        // if (!isPasswordValid) return null;
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-        };
       },
     }),
   ],
@@ -62,32 +108,32 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name as string;
         session.user.email = token.email as string;
         session.user.image = token.picture as string;
-        session.user.phone = token.phone as string;
+        session.user.provider = token.provider as string;
       }
 
       return session;
     },
-    async jwt({ token, user }: any) {
-      const dbUser = await prisma.user.findFirst({
-        where: {
-          email: token.email!,
-        },
-      });
-
-      if (!dbUser) {
-        if (user) {
-          token.id = user?.id;
-        }
-        return token;
+    async jwt({ token, user, account }: any) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
       }
-
-      return {
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
-        picture: dbUser.image,
-        phone: dbUser.phone,
-      };
+      if (account?.provider === "credentials") {
+        token.provider = "credentials";
+      } else if (account?.provider === "google") {
+        token.provider = "google";
+      }
+      
+      return token;
+    },
+    async redirect({ url, baseUrl }: any) {
+      // Redirigir a la página principal después de login
+      if (url.startsWith(baseUrl)) {
+        return `${baseUrl}/`;
+      }
+      return baseUrl;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
 };
