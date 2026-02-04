@@ -9,6 +9,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+PLAN_ECOMMERCE.md
 
 # testing
 /coverage
