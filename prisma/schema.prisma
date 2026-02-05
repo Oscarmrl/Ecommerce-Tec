@@ -123,6 +123,7 @@ model User {
   image     String?
   phone     String?
   password  String?   // Para autenticación con credenciales
+  role      String    @default("USER") // USER o ADMIN
   addresses Address[]
   orders    Order[]
   carts     Cart[]

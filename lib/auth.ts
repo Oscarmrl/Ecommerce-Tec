@@ -1,4 +1,3 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -13,7 +12,6 @@ const credentialsSchema = z.object({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 días
@@ -70,6 +68,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               email: newUser.email,
               name: newUser.name,
               image: newUser.image,
+              role: (newUser as any).role || "USER",
             };
           }
 
@@ -91,6 +90,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: user.email,
             name: user.name,
             image: user.image,
+            role: (user as any).role || "USER",
           };
         } catch (error) {
           console.error("Error en autorización:", error);
@@ -107,6 +107,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.email = token.email as string;
         session.user.image = token.picture as string;
         session.user.provider = token.provider as string;
+        session.user.role = token.role as string;
       }
 
       return session;
@@ -115,6 +116,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
+        token.role = user.role || "USER";
       }
       if (account?.provider === "credentials") {
         token.provider = "credentials";
