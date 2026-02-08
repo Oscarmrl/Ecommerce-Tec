@@ -2,109 +2,337 @@
 @import "./custom-colors.css";
 
 :root {
-  /* Colores base - Modo Claro */
-  --background: 0 0% 100%;
+  /* Sistema de Elevación - Modo Claro */
+  --background: 0 0% 99%; /* Base más suave */
   --foreground: 240 10% 3.9%;
   
-  /* Colores primarios - Azul vibrante */
+  /* Jerarquía de Superficies */
+  --surface-0: 0 0% 100%; /* Canvas principal */
+  --surface-1: 240 5% 96%; /* Elevación 1 */
+  --surface-2: 240 4% 94%; /* Elevación 2 */
+  --surface-3: 240 4% 92%; /* Elevación 3 */
+  
+  /* Colores Primarios - Azul Cobalto Tecnológico */
   --primary: 221 83% 53%;
   --primary-foreground: 0 0% 100%;
+  --primary-light: 221 83% 95%;
+  --primary-dark: 221 83% 40%;
   
-  /* Colores secundarios - Verde esmeralda */
+  /* Colores Secundarios - Verde Neón Energético */
   --secondary: 142 76% 36%;
   --secondary-foreground: 0 0% 100%;
+  --secondary-light: 142 76% 95%;
+  --secondary-dark: 142 76% 28%;
   
-  /* Colores de acento - Naranja coral */
-  --accent: 24 95% 53%;
+  /* Colores de Acento - Púrpura Eléctrico Innovador */
+  --accent: 270 76% 53%;
   --accent-foreground: 0 0% 100%;
+  --accent-light: 270 76% 95%;
+  --accent-dark: 270 76% 40%;
   
-  /* Colores de énfasis - Púrpura */
+  /* Jerarquía de Texto */
+  --text-primary: 240 10% 3.9%;
+  --text-secondary: 240 5% 34%;
+  --text-tertiary: 240 4% 46%;
+  --text-muted: 240 4% 64%;
+  
+  /* Colores de Superficies */
+  --card: var(--surface-0);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface-0);
+  --popover-foreground: var(--text-primary);
+  
+  /* Colores de Énfasis */
   --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
+  --muted-foreground: var(--text-tertiary);
   
-  /* Colores de tarjetas y superficies */
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 3.9%;
-  
-  /* Colores de estado */
+  /* Colores de Estado */
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
+  --success: 142 76% 36%;
+  --warning: 38 92% 50%;
+  --info: 221 83% 53%;
   
-  /* Colores de UI */
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --ring: 221 83% 53%;
+  /* Sistema de Bordes */
+  --border-base: 240 5% 84%;
+  --border-soft: 240 5% 90%;
+  --border-strong: 240 5% 70%;
+  --border-focus: var(--primary);
   
-  /* Radio de bordes */
-  --radius: 0.75rem;
+  /* Tokens de Control */
+  --control-bg: var(--surface-0);
+  --control-border: var(--border-base);
+  --control-focus: var(--primary-light);
+  
+  /* Anillos de Foco */
+  --ring: var(--primary);
+  --ring-offset: 0 0% 100%;
+  
+  /* Sistema de Radio */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  
+  /* Espaciado Base */
+  --spacing-unit: 0.25rem;
+  
+  /* Sistema de Sombra */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
 }
 
 .dark {
-  /* Colores base - Modo Oscuro */
-  --background: 240 10% 3.9%;
+  /* Sistema de Elevación - Modo Oscuro */
+  --background: 240 10% 4%;
   --foreground: 0 0% 98%;
   
-  /* Colores primarios - Azul brillante */
+  /* Jerarquía de Superficies */
+  --surface-0: 240 10% 6%;
+  --surface-1: 240 10% 8%;
+  --surface-2: 240 10% 10%;
+  --surface-3: 240 10% 12%;
+  
+  /* Colores Primarios - Azul Brillante Tecnológico */
   --primary: 217 91% 60%;
   --primary-foreground: 0 0% 100%;
+  --primary-light: 217 91% 20%;
+  --primary-dark: 217 91% 70%;
   
-  /* Colores secundarios - Verde lima */
+  /* Colores Secundarios - Verde Neón Energético */
   --secondary: 142 71% 45%;
   --secondary-foreground: 0 0% 100%;
+  --secondary-light: 142 71% 20%;
+  --secondary-dark: 142 71% 55%;
   
-  /* Colores de acento - Rosa neón */
-  --accent: 330 81% 60%;
+  /* Colores de Acento - Púrpura Eléctrico Innovador */
+  --accent: 270 81% 60%;
   --accent-foreground: 0 0% 100%;
+  --accent-light: 270 81% 20%;
+  --accent-dark: 270 81% 70%;
   
-  /* Colores de énfasis */
+  /* Jerarquía de Texto */
+  --text-primary: 0 0% 98%;
+  --text-secondary: 240 5% 84%;
+  --text-tertiary: 240 4% 74%;
+  --text-muted: 240 4% 64%;
+  
+  /* Colores de Superficies */
+  --card: var(--surface-0);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface-0);
+  --popover-foreground: var(--text-primary);
+  
+  /* Colores de Énfasis */
   --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
+  --muted-foreground: var(--text-tertiary);
   
-  /* Colores de tarjetas y superficies */
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  
-  /* Colores de estado */
+  /* Colores de Estado */
   --destructive: 0 63% 31%;
   --destructive-foreground: 0 0% 98%;
+  --success: 142 71% 45%;
+  --warning: 38 92% 50%;
+  --info: 217 91% 60%;
   
-  /* Colores de UI */
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 217 91% 60%;
+  /* Sistema de Bordes */
+  --border-base: 240 3.7% 25%;
+  --border-soft: 240 3.7% 20%;
+  --border-strong: 240 3.7% 30%;
+  --border-focus: var(--primary);
+  
+  /* Tokens de Control */
+  --control-bg: var(--surface-1);
+  --control-border: var(--border-base);
+  --control-focus: var(--primary-light);
+  
+  /* Anillos de Foco */
+  --ring: var(--primary);
+  --ring-offset: 240 10% 4%;
+  
+  /* Sistema de Sombra */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6);
 }
 
 @theme inline {
+  /* Sistema de Color */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
+  
+  /* Jerarquía de Superficies */
+  --color-surface-0: hsl(var(--surface-0));
+  --color-surface-1: hsl(var(--surface-1));
+  --color-surface-2: hsl(var(--surface-2));
+  --color-surface-3: hsl(var(--surface-3));
+  
+  /* Colores Principales */
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-light: hsl(var(--primary-light));
+  --color-primary-dark: hsl(var(--primary-dark));
+  
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-light: hsl(var(--secondary-light));
+  --color-secondary-dark: hsl(var(--secondary-dark));
+  
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-light: hsl(var(--accent-light));
+  --color-accent-dark: hsl(var(--accent-dark));
+  
+  /* Jerarquía de Texto */
+  --color-text-primary: hsl(var(--text-primary));
+  --color-text-secondary: hsl(var(--text-secondary));
+  --color-text-tertiary: hsl(var(--text-tertiary));
+  --color-text-muted: hsl(var(--text-muted));
+  
+  /* Superficies */
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
   --color-popover: hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  
+  /* Énfasis */
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  
+  /* Estados */
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+  --color-info: hsl(var(--info));
+  
+  /* Sistema de Bordes */
+  --color-border-base: hsl(var(--border-base));
+  --color-border-soft: hsl(var(--border-soft));
+  --color-border-strong: hsl(var(--border-strong));
+  --color-border-focus: hsl(var(--border-focus));
+  
+  /* Tokens de Control */
+  --color-control-bg: hsl(var(--control-bg));
+  --color-control-border: hsl(var(--control-border));
+  --color-control-focus: hsl(var(--control-focus));
+  
+  /* Anillos */
   --color-ring: hsl(var(--ring));
-  --radius: var(--radius);
+  --color-ring-offset: hsl(var(--ring-offset));
+  
+  /* Sistema de Radio */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+  
+  /* Sistema de Sombra */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  
+  /* Tipografía */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Espaciado */
+  --spacing-unit: var(--spacing-unit);
 }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Patrón de Circuitos - Signature Element */
+.circuit-pattern {
+  background-image: 
+    linear-gradient(to right, hsl(var(--border-soft)) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--border-soft)) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.15;
+}
+
+.circuit-pattern-intense {
+  background-image: 
+    linear-gradient(to right, hsl(var(--border-base)) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--border-base)) 1px, transparent 1px);
+  background-size: 16px 16px;
+  opacity: 0.25;
+}
+
+/* Utilidades de Elevación */
+.elevation-0 { background-color: hsl(var(--surface-0)); }
+.elevation-1 { background-color: hsl(var(--surface-1)); }
+.elevation-2 { background-color: hsl(var(--surface-2)); }
+.elevation-3 { background-color: hsl(var(--surface-3)); }
+
+/* Utilidades de Texto */
+.text-primary { color: hsl(var(--text-primary)); }
+.text-secondary { color: hsl(var(--text-secondary)); }
+.text-tertiary { color: hsl(var(--text-tertiary)); }
+.text-muted { color: hsl(var(--text-muted)); }
+
+/* Utilidades de Borde */
+.border-base { border-color: hsl(var(--border-base)); }
+.border-soft { border-color: hsl(var(--border-soft)); }
+.border-strong { border-color: hsl(var(--border-strong)); }
+
+/* Transiciones Suaves */
+.transition-smooth {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+.transition-slower {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Efectos de Hover */
+.hover-lift {
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Gradientes Tecnológicos */
+.gradient-tech-primary {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+}
+
+.gradient-tech-secondary {
+  background: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--primary)));
+}
+
+.gradient-tech-accent {
+  background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--secondary)));
+}
+
+/* Efectos de Brillo */
+.glow-primary {
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.15);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 20px hsl(var(--secondary) / 0.15);
+}
+
+.glow-accent {
+  box-shadow: 0 0 20px hsl(var(--accent) / 0.15);
 }
