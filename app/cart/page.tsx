@@ -12,7 +12,7 @@ export default function CartPage() {
       name: "iPhone 15 Pro",
       price: 999.99,
       quantity: 1,
-      image: "/placeholder-product.jpg",
+      image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop&crop=center",
       category: "Smartphones",
     },
     {
@@ -20,7 +20,7 @@ export default function CartPage() {
       name: "MacBook Pro M3",
       price: 1299.99,
       quantity: 1,
-      image: "/placeholder-product.jpg",
+      image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=400&fit=crop&crop=center",
       category: "Laptops",
     },
     {
@@ -28,7 +28,7 @@ export default function CartPage() {
       name: "Sony WH-1000XM5",
       price: 399.99,
       quantity: 2,
-      image: "/placeholder-product.jpg",
+      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&crop=center",
       category: "Audio",
     },
   ]
@@ -85,15 +85,19 @@ export default function CartPage() {
                     <TableBody>
                       {cartItems.map((item) => (
                         <TableRow key={item.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-4">
-                              <div className="h-20 w-20 rounded-lg bg-gray-200"></div>
-                              <div>
-                                <h3 className="font-semibold">{item.name}</h3>
-                                <p className="text-sm text-gray-500">{item.category}</p>
-                              </div>
-                            </div>
-                          </TableCell>
+                           <TableCell>
+                             <div className="flex items-center gap-4">
+                               <img 
+                                 src={item.image} 
+                                 alt={item.name}
+                                 className="h-20 w-20 rounded-lg object-cover"
+                               />
+                               <div>
+                                 <h3 className="font-semibold">{item.name}</h3>
+                                 <p className="text-sm text-gray-500">{item.category}</p>
+                               </div>
+                             </div>
+                           </TableCell>
                           <TableCell className="text-center">
                             <span className="font-semibold">${item.price.toFixed(2)}</span>
                           </TableCell>

@@ -160,7 +160,12 @@ export default function Footer() {
               © {new Date().getFullYear()} TechStore. Todos los derechos reservados.
             </p>
             <div className="flex items-center gap-6">
-              <img src="/placeholder-payment.png" alt="Payment methods" className="h-8" />
+               <div className="flex items-center gap-2">
+                 <div className="h-8 w-12 bg-blue-100 rounded flex items-center justify-center text-blue-600 font-bold text-xs">VISA</div>
+                 <div className="h-8 w-12 bg-yellow-100 rounded flex items-center justify-center text-yellow-600 font-bold text-xs">MC</div>
+                 <div className="h-8 w-12 bg-red-100 rounded flex items-center justify-center text-red-600 font-bold text-xs">AMEX</div>
+                 <div className="h-8 w-12 bg-green-100 rounded flex items-center justify-center text-green-600 font-bold text-xs">PP</div>
+               </div>
               <div className="text-sm text-muted-foreground">
                 <span className="text-green-400">●</span> Sitio seguro
               </div>

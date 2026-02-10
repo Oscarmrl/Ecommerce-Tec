@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { GradientButton } from "@/components/ui/gradient-button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,10 +15,10 @@ export default function HomePage() {
   ]
 
   const featuredProducts = [
-    { id: 1, name: "iPhone 15 Pro", price: 999, image: "/placeholder-product.jpg", category: "Smartphones", rating: 4.8, isNew: true, discount: 10 },
-    { id: 2, name: "MacBook Pro M3", price: 1299, image: "/placeholder-product.jpg", category: "Laptops", rating: 4.9, isNew: false, discount: 0 },
-    { id: 3, name: "Sony WH-1000XM5", price: 399, image: "/placeholder-product.jpg", category: "Audio", rating: 4.7, isNew: true, discount: 15 },
-    { id: 4, name: "Samsung Galaxy S24", price: 899, image: "/placeholder-product.jpg", category: "Smartphones", rating: 4.6, isNew: false, discount: 5 },
+    { id: 1, name: "iPhone 15 Pro", price: 999, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=800&fit=crop&crop=center", category: "Smartphones", rating: 4.8, isNew: true, discount: 10 },
+    { id: 2, name: "MacBook Pro M3", price: 1299, image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w-800&h=800&fit=crop&crop=center", category: "Laptops", rating: 4.9, isNew: false, discount: 0 },
+    { id: 3, name: "Sony WH-1000XM5", price: 399, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=800&fit=crop&crop=center", category: "Audio", rating: 4.7, isNew: true, discount: 15 },
+    { id: 4, name: "Samsung Galaxy S24", price: 899, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=800&fit=crop&crop=center", category: "Smartphones", rating: 4.6, isNew: false, discount: 5 },
   ]
 
   const features = [
@@ -270,41 +271,50 @@ export default function HomePage() {
                    key={product.id} 
                    className="group relative overflow-hidden rounded-xl border border-soft bg-surface-0 hover:border-primary/40 hover-lift transition-smooth"
                  >
-                   {/* Product Image Area */}
-                   <div className="relative aspect-square bg-gradient-to-br from-surface-1 to-surface-0 overflow-hidden">
-                     <div className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                     
-                     {/* Status Badges */}
-                     <div className="absolute top-3 left-3 flex flex-col gap-2">
-                       {product.isNew && (
-                         <div className="px-2 py-1 rounded-full bg-primary text-xs font-semibold text-primary-foreground shadow-sm">
-                           NUEVO
-                         </div>
-                       )}
-                       {product.discount > 0 && (
-                         <div className="px-2 py-1 rounded-full bg-accent text-xs font-semibold text-accent-foreground shadow-sm">
-                           -{product.discount}%
-                         </div>
-                       )}
-                     </div>
-                     
-                     {/* Rating */}
-                     <div className="absolute top-3 right-3 flex items-center gap-1 bg-surface-0/90 backdrop-blur-sm px-2 py-1 rounded-full border border-soft">
-                       <Star className="w-3 h-3 fill-primary text-primary" />
-                       <span className="text-xs font-semibold text-primary">{product.rating}</span>
-                     </div>
-                     
-                     {/* Quick Action */}
-                     <div className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                       <Button 
-                         size="sm" 
-                         className={`${accentColors[index]} rounded-full px-4 shadow-md hover-lift`}
-                       >
-                         <ShoppingCart className="w-3 h-3 mr-2" />
-                         Agregar
-                       </Button>
-                     </div>
-                   </div>
+                    {/* Product Image Area */}
+                    <div className="relative aspect-square bg-gradient-to-br from-surface-1 to-surface-0 overflow-hidden">
+                      {/* Product Image */}
+                      <div className="absolute inset-0">
+                        <Image 
+                          src={product.image} 
+                          alt={product.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                      </div>
+                      
+                      {/* Status Badges */}
+                      <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
+                        {product.isNew && (
+                          <div className="px-2 py-1 rounded-full bg-primary text-xs font-semibold text-primary-foreground shadow-sm">
+                            NUEVO
+                          </div>
+                        )}
+                        {product.discount > 0 && (
+                          <div className="px-2 py-1 rounded-full bg-accent text-xs font-semibold text-accent-foreground shadow-sm">
+                            -{product.discount}%
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Rating */}
+                      <div className="absolute top-3 right-3 flex items-center gap-1 bg-surface-0/90 backdrop-blur-sm px-2 py-1 rounded-full border border-soft z-10">
+                        <Star className="w-3 h-3 fill-primary text-primary" />
+                        <span className="text-xs font-semibold text-primary">{product.rating}</span>
+                      </div>
+                      
+                      {/* Quick Action */}
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <Button 
+                          size="sm" 
+                          className={`${accentColors[index]} rounded-full px-4 shadow-md hover-lift`}
+                        >
+                          <ShoppingCart className="w-3 h-3 mr-2" />
+                          Agregar
+                        </Button>
+                      </div>
+                    </div>
                    
                    {/* Product Info */}
                    <div className="p-5">

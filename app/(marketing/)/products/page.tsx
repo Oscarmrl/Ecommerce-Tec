@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -6,16 +7,29 @@ import { Slider } from "@/components/ui/slider"
 import { Filter, Grid, List, ShoppingCart, Star } from "lucide-react"
 
 export default function ProductsPage() {
-  const products = Array.from({ length: 12 }).map((_, i) => ({
-    id: i + 1,
-    name: `Producto ${i + 1}`,
-    price: 99.99 + i * 50,
-    category: ["Smartphones", "Laptops", "Audio", "Accessories"][i % 4],
-    rating: 4 + Math.random(),
-    reviews: Math.floor(Math.random() * 100),
-    image: "/placeholder-product.jpg",
-    featured: i < 4,
-  }))
+  const products = Array.from({ length: 12 }).map((_, i) => {
+    const categories = ["Smartphones", "Laptops", "Audio", "Accessories"];
+    const category = categories[i % 4];
+    
+    // Different Unsplash images for different categories
+    const images = {
+      "Smartphones": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop&crop=center",
+      "Laptops": "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=400&fit=crop&crop=center",
+      "Audio": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&crop=center",
+      "Accessories": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=400&fit=crop&crop=center",
+    };
+    
+    return {
+      id: i + 1,
+      name: `Producto ${i + 1}`,
+      price: 99.99 + i * 50,
+      category: category,
+      rating: 4 + Math.random(),
+      reviews: Math.floor(Math.random() * 100),
+      image: images[category as keyof typeof images],
+      featured: i < 4,
+    };
+  })
 
   const categories = [
     "Todos",
@@ -182,11 +196,14 @@ export default function ProductsPage() {
                       </span>
                     </div>
                   )}
-                  <div className="aspect-square bg-gray-200 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-gray-400">Imagen del producto</div>
-                    </div>
-                  </div>
+                   <div className="aspect-square bg-gray-200 relative overflow-hidden">
+                     <Image 
+                       src={product.image} 
+                       alt={product.name}
+                       fill
+                       className="object-cover hover:scale-105 transition-transform duration-300"
+                     />
+                   </div>
                   <CardHeader>
                     <CardTitle className="text-lg">{product.name}</CardTitle>
                     <CardDescription>{product.category}</CardDescription>
