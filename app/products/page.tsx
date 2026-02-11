@@ -3,26 +3,112 @@ import ProductFilters from "@/components/products/product-filters";
 import { prisma } from "@/lib/prisma";
 
 export default async function ProductsPage() {
-  // Obtener productos de ejemplo (en producción usarías filtros reales)
-  const products = await prisma.product.findMany({
-    take: 12,
-    include: {
-      category: true,
-      variants: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  let products: any[] = [];
+  let categories: any[] = [];
+  
+  try {
+    // Obtener productos de ejemplo (en producción usarías filtros reales)
+    products = await prisma.product.findMany({
+      take: 12,
+      include: {
+        category: true,
+        variants: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-  const categories = await prisma.category.findMany({
-    where: {
-      parentId: null, // Solo categorías principales
-    },
-    include: {
-      children: true,
-    },
-  });
+    categories = await prisma.category.findMany({
+      where: {
+        parentId: null, // Solo categorías principales
+      },
+      include: {
+        children: {
+          include: {
+            children: true,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error al cargar productos o categorías:", error);
+    // Datos de ejemplo para desarrollo
+    products = [
+      {
+        id: "1",
+        name: "MacBook Pro 16\"",
+        slug: "macbook-pro-16",
+        description: "Potente laptop para profesionales",
+        price: 2499,
+        comparePrice: 2799,
+        images: ["https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop"],
+        rating: 4.8,
+        featured: true,
+        inventory: 10,
+        brand: "Apple",
+        processor: "Apple M3 Pro",
+        ram: "16GB",
+        category: { name: "Laptops" },
+        variants: []
+      },
+      {
+        id: "2",
+        name: "Dell XPS 15",
+        slug: "dell-xps-15",
+        description: "Laptop premium para creativos",
+        price: 1899,
+        comparePrice: 2099,
+        images: ["https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop"],
+        rating: 4.6,
+        featured: true,
+        inventory: 15,
+        brand: "Dell",
+        processor: "Intel Core i7",
+        ram: "16GB",
+        category: { name: "Laptops" },
+        variants: []
+      },
+      {
+        id: "3",
+        name: "HP Spectre x360",
+        slug: "hp-spectre-x360",
+        description: "Laptop convertible 2 en 1",
+        price: 1499,
+        comparePrice: 1699,
+        images: ["https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop"],
+        rating: 4.5,
+        featured: false,
+        inventory: 8,
+        brand: "HP",
+        processor: "Intel Core i5",
+        ram: "8GB",
+        category: { name: "Laptops" },
+        variants: []
+      }
+    ];
+    
+    categories = [
+      {
+        id: "1",
+        name: "Laptops",
+        slug: "laptops",
+        children: [
+          { id: "2", name: "Gaming", slug: "gaming-laptops", children: [] },
+          { id: "3", name: "Ultrabooks", slug: "ultrabooks", children: [] }
+        ]
+      },
+      {
+        id: "4",
+        name: "Desktop",
+        slug: "desktop",
+        children: [
+          { id: "5", name: "Gaming PC", slug: "gaming-pc", children: [] },
+          { id: "6", name: "Workstation", slug: "workstation", children: [] }
+        ]
+      }
+    ];
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

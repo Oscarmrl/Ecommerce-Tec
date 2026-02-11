@@ -1,9 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, ShoppingCart } from "lucide-react";
+import { Star, ShoppingCart, Package } from "lucide-react";
 
 interface ProductCardProps {
   product: {
@@ -53,9 +55,17 @@ export default function ProductCard({ product }: ProductCardProps) {
             {discount > 0 && (
               <Badge className="bg-accent text-accent-foreground">-{discount}%</Badge>
             )}
-            {product.inventory === 0 && (
-              <Badge variant="destructive">Agotado</Badge>
-            )}
+           {product.inventory === 0 ? (
+              <Badge variant="destructive">
+                <Package className="h-3 w-3 mr-1" />
+                Agotado
+              </Badge>
+            ) : product.inventory <= 10 ? (
+              <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+                <Package className="h-3 w-3 mr-1" />
+                Últimas {product.inventory}
+              </Badge>
+            ) : null}
           </div>
         </div>
       </Link>

@@ -23,7 +23,24 @@ export default function ProductGrid({ products }: ProductGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard
+          key={product.id}
+          product={{
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            description: product.description,
+            price: Number(product.price),
+            comparePrice: product.comparePrice ? Number(product.comparePrice) : null,
+            images: product.images,
+            rating: product.rating,
+            featured: product.featured,
+            inventory: product.inventory,
+            brand: product.brand,
+            processor: product.processor,
+            ram: product.ram,
+          }}
+        />
       ))}
     </div>
   );
