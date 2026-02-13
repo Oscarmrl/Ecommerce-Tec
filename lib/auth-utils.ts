@@ -1,5 +1,6 @@
 // lib/auth-utils.ts
-import { auth } from "@/lib/auth";
+import { getServerSession as nextAuthGetServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-v4";
 import { NextRequest, NextResponse } from "next/server";
 
 // ----------------------
@@ -34,7 +35,7 @@ export function hasRole(
 // Obtener sesión del servidor (NextAuth)
 // ----------------------
 export async function getServerSession() {
-  return await auth();
+  return await nextAuthGetServerSession(authOptions);
 }
 
 // ----------------------

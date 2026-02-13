@@ -7,96 +7,93 @@ datasource db {
 }
 
 model Category {
-  id          String    @id @default(cuid())
+  id          String     @id @default(cuid())
   name        String
-  slug        String    @unique
+  slug        String     @unique
   description String?
   image       String?
-  icon        String?   // Icono para la UI
-  parentId    String?   // Para subcategorías
-  parent      Category? @relation("CategoryChildren", fields: [parentId], references: [id])
+  icon        String?
+  parentId    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  parent      Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
   children    Category[] @relation("CategoryChildren")
   products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
 
   @@map("categories")
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?
+  id               String           @id @default(cuid())
+  name             String
+  slug             String           @unique
+  description      String?
   shortDescription String?
-  price       Decimal  @db.Decimal(10, 2)
-  comparePrice Decimal? @db.Decimal(10, 2)
-  images      String[]
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  variants    ProductVariant[]
-  reviews     Review[]
-  cartItems   CartItem[]
-  orderItems  OrderItem[]
-  featured    Boolean  @default(false)
-  inventory   Int      @default(0)
-  rating      Float?   @default(0)
-  tags        String[]
-  
-  // Especificaciones para computadoras
-  brand       String?  // Apple, Dell, HP, Lenovo, etc.
-  processor   String?  // Intel Core i7, AMD Ryzen 9, etc.
-  ram         String?  // 16GB, 32GB, etc.
-  storage     String?  // 512GB SSD, 1TB HDD, etc.
-  graphics    String?  // NVIDIA RTX 4060, AMD Radeon, etc.
-  display     String?  // 14" FHD, 15.6" 4K, etc.
-  os          String?  // Windows 11, macOS, Linux
-  weight      String?  // 1.5kg, 2.3kg, etc.
-  battery     String?  // 8 horas, 12 horas, etc.
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  price            Decimal          @db.Decimal(10, 2)
+  comparePrice     Decimal?         @db.Decimal(10, 2)
+  images           String[]
+  categoryId       String
+  featured         Boolean          @default(false)
+  inventory        Int              @default(0)
+  rating           Float?           @default(0)
+  tags             String[]
+  brand            String?
+  processor        String?
+  ram              String?
+  storage          String?
+  graphics         String?
+  display          String?
+  os               String?
+  weight           String?
+  battery          String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  variants         ProductVariant[]
+  category         Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  reviews          Review[]
 
   @@map("products")
 }
 
 model ProductVariant {
-  id        String   @id @default(cuid())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  name      String   // Ej: "Color", "RAM", "Storage"
-  value     String   // Ej: "Negro", "16GB", "1TB SSD"
-  price     Decimal? @db.Decimal(10, 2)
-  inventory Int      @default(0)
-  sku       String?  @unique
-  cartItems CartItem[]
+  id         String      @id @default(cuid())
+  productId  String
+  name       String
+  value      String
+  price      Decimal?    @db.Decimal(10, 2)
+  inventory  Int         @default(0)
+  sku        String?     @unique
+  cartItems  CartItem[]
   orderItems OrderItem[]
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("product_variants")
 }
 
 model Cart {
-  id        String    @id @default(cuid())
+  id        String     @id @default(cuid())
   userId    String?
-  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId String?   // Para usuarios no autenticados
+  sessionId String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   items     CartItem[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("carts")
 }
 
 model CartItem {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   cartId    String
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
   variantId String?
+  quantity  Int             @default(1)
+  cart      Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id])
   variant   ProductVariant? @relation(fields: [variantId], references: [id])
-  quantity  Int      @default(1)
-  
+
   @@unique([cartId, productId, variantId])
   @@map("cart_items")
 }
@@ -104,7 +101,6 @@ model CartItem {
 model Review {
   id        String   @id @default(cuid())
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId    String?
   userName  String
   userEmail String
@@ -112,6 +108,7 @@ model Review {
   comment   String?
   approved  Boolean  @default(false)
   createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
 }
@@ -122,66 +119,66 @@ model User {
   name      String?
   image     String?
   phone     String?
-  password  String?   // Para autenticación con credenciales
-  role      String    @default("USER") // USER o ADMIN
-  addresses Address[]
-  orders    Order[]
-  carts     Cart[]
+  password  String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  role      String    @default("USER")
+  addresses Address[]
+  carts     Cart[]
+  orders    Order[]
 
   @@map("users")
 }
 
 model Address {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  street      String
-  city        String
-  state       String
-  postalCode  String
-  country     String
-  phone       String?
-  isDefault   Boolean  @default(false)
-  shippingOrders Order[] @relation("OrderShippingAddress")
-  billingOrders  Order[] @relation("OrderBillingAddress")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  userId         String
+  street         String
+  city           String
+  state          String
+  postalCode     String
+  country        String
+  phone          String?
+  isDefault      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  billingOrders  Order[]  @relation("OrderBillingAddress")
+  shippingOrders Order[]  @relation("OrderShippingAddress")
 
   @@map("addresses")
 }
 
 model Order {
-  id           String        @id @default(cuid())
-  userId       String?
-  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
-  orderNumber  String        @unique
-  items        OrderItem[]
-  total        Decimal       @db.Decimal(10, 2)
-  status       OrderStatus   @default(PENDING)
+  id                String        @id @default(cuid())
+  userId            String?
+  orderNumber       String        @unique
+  total             Decimal       @db.Decimal(10, 2)
+  status            OrderStatus   @default(PENDING)
   shippingAddressId String?
-  shippingAddress Address?   @relation("OrderShippingAddress", fields: [shippingAddressId], references: [id])
-  billingAddressId String?
-  billingAddress  Address?   @relation("OrderBillingAddress", fields: [billingAddressId], references: [id])
-  paymentMethod String?
-  paymentStatus PaymentStatus @default(PENDING)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  billingAddressId  String?
+  paymentMethod     String?
+  paymentStatus     PaymentStatus @default(PENDING)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  items             OrderItem[]
+  billingAddress    Address?      @relation("OrderBillingAddress", fields: [billingAddressId], references: [id])
+  shippingAddress   Address?      @relation("OrderShippingAddress", fields: [shippingAddressId], references: [id])
+  user              User?         @relation(fields: [userId], references: [id])
 
   @@map("orders")
 }
 
 model OrderItem {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   orderId   String
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
   variantId String?
+  quantity  Int             @default(1)
+  price     Decimal         @db.Decimal(10, 2)
+  order     Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id])
   variant   ProductVariant? @relation(fields: [variantId], references: [id])
-  quantity  Int      @default(1)
-  price     Decimal  @db.Decimal(10, 2)
 
   @@map("order_items")
 }
