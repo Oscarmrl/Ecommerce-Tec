@@ -32,7 +32,8 @@ export async function middleware(req: NextRequest) {
   );
 
   // Si es una ruta protegida y no está autenticado
-  if (isProtectedRoute && !isAuth) {
+  // Excluir rutas API (deben manejar autenticación ellas mismas)
+  if (isProtectedRoute && !isAuth && !req.nextUrl.pathname.startsWith("/api")) {
     let from = req.nextUrl.pathname;
     if (req.nextUrl.search) {
       from += req.nextUrl.search;
