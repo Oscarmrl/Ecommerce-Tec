@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, ShoppingCart, Package } from "lucide-react";
+import { useCart } from "@/contexts/cart-context";
 
 interface ProductCardProps {
   product: {
@@ -26,9 +28,36 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { addItem, isLoading } = useCart();
+  const [isAdding, setIsAdding] = useState(false);
   const discount = product.comparePrice
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 0;
+
+  const handleAddToCart = async () => {
+    if (isAdding) return;
+    setIsAdding(true);
+    try {
+      await addItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        image: product.images[0] || "",
+        category: product.brand || "",
+        slug: product.slug,
+        inventory: product.inventory,
+        productId: product.id,
+      });
+      console.log("Producto agregado al carrito");
+    } catch (error: any) {
+      console.error("Error al agregar al carrito:", error);
+      const message = error?.message || "Error al agregar al carrito. Intenta nuevamente.";
+      alert(message);
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
@@ -118,14 +147,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       <CardFooter className="p-4 pt-0">
         <Button
           className="w-full"
-          disabled={product.inventory === 0}
-          onClick={() => {
-            // TODO: Add to cart functionality
-            console.log("Add to cart:", product.id);
-          }}
+          disabled={product.inventory === 0 || isAdding || isLoading}
+          onClick={handleAddToCart}
         >
           <ShoppingCart className="h-4 w-4 mr-2" />
-          {product.inventory === 0 ? "Agotado" : "Agregar al Carrito"}
+          {product.inventory === 0 ? "Agotado" : isAdding ? "Agregando..." : "Agregar al Carrito"}
         </Button>
       </CardFooter>
     </Card>
