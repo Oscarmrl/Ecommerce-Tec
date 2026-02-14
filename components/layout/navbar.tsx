@@ -24,12 +24,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useCart } from "@/contexts/cart-context"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { data: session, status } = useSession()
   const isAuthenticated = status === "authenticated"
   const isLoading = status === "loading"
+  const { getItemCount } = useCart()
+  const cartItemCount = getItemCount()
 
   const navLinks = [
     { href: "/", label: "Inicio" },
@@ -180,11 +183,16 @@ export default function Navbar() {
               variant="ghost" 
               size="icon"
               className="relative rounded-lg hover:bg-surface-1 text-tertiary hover:text-primary transition-smooth group"
+              asChild
             >
-              <ShoppingCart className="h-4 w-4" />
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full gradient-tech-primary text-xs font-medium text-primary-foreground shadow-md group-hover:glow-primary transition-smooth">
-                3
-              </span>
+              <Link href="/cart">
+                <ShoppingCart className="h-4 w-4" />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full gradient-tech-primary text-xs font-medium text-primary-foreground shadow-md group-hover:glow-primary transition-smooth">
+                    {cartItemCount > 9 ? "9+" : cartItemCount}
+                  </span>
+                )}
+              </Link>
             </Button>
             <ThemeToggle />
             <Button

@@ -1,42 +1,52 @@
+"use client";
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from "lucide-react"
 import Link from "next/link"
+import { useCart } from "@/contexts/cart-context"
 
 export default function CartPage() {
-  const cartItems = [
-    {
-      id: 1,
-      name: "iPhone 15 Pro",
-      price: 999.99,
-      quantity: 1,
-      image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop&crop=center",
-      category: "Smartphones",
-    },
-    {
-      id: 2,
-      name: "MacBook Pro M3",
-      price: 1299.99,
-      quantity: 1,
-      image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=400&fit=crop&crop=center",
-      category: "Laptops",
-    },
-    {
-      id: 3,
-      name: "Sony WH-1000XM5",
-      price: 399.99,
-      quantity: 2,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&crop=center",
-      category: "Audio",
-    },
-  ]
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const { items, updateQuantity, removeItem, getTotalPrice, clearCart, isLoading } = useCart()
+  const [loadingItems, setLoadingItems] = useState<Record<string, boolean>>({})
+  
+  const subtotal = getTotalPrice()
   const shipping = subtotal > 500 ? 0 : 29.99
   const tax = subtotal * 0.08
   const total = subtotal + shipping + tax
+
+  const handleUpdateQuantity = async (id: string, change: number) => {
+    const item = items.find(item => item.id === id)
+    if (item) {
+      const newQuantity = item.quantity + change
+      if (newQuantity < 1) return
+      setLoadingItems((prev: Record<string, boolean>) => ({ ...prev, [id]: true }))
+      try {
+        await updateQuantity(id, newQuantity)
+      } catch (error) {
+        console.error("Error al actualizar cantidad:", error)
+        alert("Error al actualizar cantidad. Intenta nuevamente.")
+      } finally {
+        setLoadingItems((prev: Record<string, boolean>) => ({ ...prev, [id]: false }))
+      }
+    }
+  }
+
+  const handleRemoveItem = async (id: string) => {
+    if (!confirm("¿Estás seguro de eliminar este producto del carrito?")) return
+    setLoadingItems((prev: Record<string, boolean>) => ({ ...prev, [id]: true }))
+    try {
+      await removeItem(id)
+    } catch (error) {
+      console.error("Error al eliminar item:", error)
+      alert("Error al eliminar item. Intenta nuevamente.")
+    } finally {
+      setLoadingItems((prev: Record<string, boolean>) => ({ ...prev, [id]: false }))
+    }
+  }
 
   return (
     <div className="min-h-screen py-8">
@@ -49,7 +59,7 @@ export default function CartPage() {
           </p>
         </div>
 
-        {cartItems.length === 0 ? (
+        {items.length === 0 ? (
           <div className="text-center py-16">
             <ShoppingBag className="h-24 w-24 text-gray-300 mx-auto mb-6" />
             <h2 className="text-2xl font-semibold mb-4">Tu carrito está vacío</h2>
@@ -66,7 +76,7 @@ export default function CartPage() {
             <div className="lg:w-2/3">
               <Card>
                 <CardHeader>
-                  <CardTitle>Productos ({cartItems.length})</CardTitle>
+                   <CardTitle>Productos ({items.length})</CardTitle>
                   <CardDescription>
                     Puedes modificar las cantidades o eliminar productos
                   </CardDescription>
@@ -82,16 +92,17 @@ export default function CartPage() {
                         <TableHead className="text-center">Acciones</TableHead>
                       </TableRow>
                     </TableHeader>
-                    <TableBody>
-                      {cartItems.map((item) => (
+                     <TableBody>
+                       {items.map((item) => (
                         <TableRow key={item.id}>
                            <TableCell>
                              <div className="flex items-center gap-4">
-                               <img 
-                                 src={item.image} 
-                                 alt={item.name}
-                                 className="h-20 w-20 rounded-lg object-cover"
-                               />
+                              {/* Using img instead of Next.js Image for external URLs */}
+                              <img 
+                                src={item.image || "/placeholder-product.jpg"} 
+                                alt={item.name}
+                                className="h-20 w-20 rounded-lg object-cover"
+                              />
                                <div>
                                  <h3 className="font-semibold">{item.name}</h3>
                                  <p className="text-sm text-gray-500">{item.category}</p>
@@ -101,27 +112,45 @@ export default function CartPage() {
                           <TableCell className="text-center">
                             <span className="font-semibold">${item.price.toFixed(2)}</span>
                           </TableCell>
-                          <TableCell>
-                            <div className="flex items-center justify-center gap-2">
-                              <Button variant="outline" size="icon" className="h-8 w-8">
-                                <Minus className="h-3 w-3" />
-                              </Button>
-                              <span className="w-12 text-center">{item.quantity}</span>
-                              <Button variant="outline" size="icon" className="h-8 w-8">
-                                <Plus className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                           <TableCell>
+                             <div className="flex items-center justify-center gap-2">
+                               <Button 
+                                 variant="outline" 
+                                 size="icon" 
+                                 className="h-8 w-8"
+                                  disabled={loadingItems[item.id] || isLoading}
+                                  onClick={() => handleUpdateQuantity(item.id, -1)}
+                               >
+                                 <Minus className="h-3 w-3" />
+                               </Button>
+                               <span className="w-12 text-center">{item.quantity}</span>
+                               <Button 
+                                 variant="outline" 
+                                 size="icon" 
+                                 className="h-8 w-8"
+                                  disabled={loadingItems[item.id] || isLoading}
+                                  onClick={() => handleUpdateQuantity(item.id, 1)}
+                               >
+                                 <Plus className="h-3 w-3" />
+                               </Button>
+                             </div>
+                           </TableCell>
                           <TableCell className="text-center">
                             <span className="font-bold">
                               ${(item.price * item.quantity).toFixed(2)}
                             </span>
                           </TableCell>
-                          <TableCell className="text-center">
-                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
+                           <TableCell className="text-center">
+                             <Button 
+                               variant="ghost" 
+                               size="icon" 
+                               className="text-red-500 hover:text-red-700"
+                                disabled={loadingItems[item.id] || isLoading}
+                                onClick={() => handleRemoveItem(item.id)}
+                             >
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
+                           </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -134,7 +163,9 @@ export default function CartPage() {
                       Continuar Comprando
                     </Link>
                   </Button>
-                  <Button variant="outline">Actualizar Carrito</Button>
+                  <Button variant="outline" onClick={() => {/* Podría recalcular algo o sincronizar */}}>
+                    Actualizar Carrito
+                  </Button>
                 </CardFooter>
               </Card>
 
