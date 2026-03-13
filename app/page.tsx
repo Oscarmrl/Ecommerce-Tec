@@ -398,12 +398,13 @@ export default async function HomePage() {
                     <div className="relative aspect-square bg-gradient-to-br from-surface-1 to-surface-0 overflow-hidden">
                       {/* Product Image */}
                       <div className="absolute inset-0">
-                        <Image
-                          src={product.image || PLACEHOLDER_IMG}
-                          alt={product.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
+                         <Image
+                           src={product.image || PLACEHOLDER_IMG}
+                           alt={product.name}
+                           fill
+                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                           className="object-cover group-hover:scale-105 transition-transform duration-300"
+                         />
                         <div
                           className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                         />
