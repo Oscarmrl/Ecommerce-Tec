@@ -64,12 +64,13 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/products/${product.slug}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
           {product.images[0] ? (
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+             <Image
+               src={product.images[0]}
+               alt={product.name}
+               fill
+               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+               className="object-cover group-hover:scale-105 transition-transform duration-300"
+             />
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-muted-foreground">Sin imagen</div>

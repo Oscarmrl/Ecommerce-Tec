@@ -40,7 +40,29 @@ export default function RegisterPage() {
     }
 
     try {
-      // Intentar crear cuenta con credenciales
+      // Primero registrar al usuario
+      const registerResponse = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      })
+
+      const registerData = await registerResponse.json()
+
+      if (!registerResponse.ok) {
+        // Si hay error del servidor
+        setErrorMessage(registerData.error || "Error al crear la cuenta")
+        setIsLoading(false)
+        return
+      }
+
+      // Si el registro fue exitoso, iniciar sesión automáticamente
       const result = await signIn("credentials", {
         email,
         password,
