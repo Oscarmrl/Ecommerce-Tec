@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
@@ -116,11 +117,13 @@ export default function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative">
                     {session?.user?.image ? (
-                      <img
-                        src={session.user.image}
-                        alt={session.user.name || "Usuario"}
-                        className="h-6 w-6 rounded-full"
-                      />
+                       <Image
+                         src={session.user.image}
+                         alt={session.user.name || "Usuario"}
+                         width={24}
+                         height={24}
+                         className="h-6 w-6 rounded-full"
+                       />
                     ) : (
                       <User className="h-5 w-5" />
                     )}

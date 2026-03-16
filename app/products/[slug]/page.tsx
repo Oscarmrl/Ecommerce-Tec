@@ -7,15 +7,15 @@ import { Star, Package, Truck, Shield, RotateCcw } from "lucide-react";
 import ProductActions from "@/components/products/product-actions";
 
 interface ProductDetailPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
 
   let product;
   try {
@@ -97,6 +97,7 @@ export default async function ProductDetailPage({
               src={product.images[0] || "/placeholder-product.jpg"}
               alt={product.name}
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
               priority
             />
@@ -119,12 +120,13 @@ export default async function ProductDetailPage({
                 key={index}
                 className="relative aspect-square overflow-hidden rounded-md bg-muted cursor-pointer hover:opacity-80 transition-opacity"
               >
-                <Image
-                  src={image}
-                  alt={`${product.name} - Vista ${index + 1}`}
-                  fill
-                  className="object-cover"
-                />
+                 <Image
+                   src={image}
+                   alt={`${product.name} - Vista ${index + 1}`}
+                   fill
+                   sizes="(max-width: 1024px) 25vw, 12.5vw"
+                   className="object-cover"
+                 />
               </div>
             ))}
           </div>

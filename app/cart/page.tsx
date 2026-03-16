@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -97,12 +98,13 @@ export default function CartPage() {
                         <TableRow key={item.id}>
                            <TableCell>
                              <div className="flex items-center gap-4">
-                              {/* Using img instead of Next.js Image for external URLs */}
-                              <img 
-                                src={item.image || "/placeholder-product.jpg"} 
-                                alt={item.name}
-                                className="h-20 w-20 rounded-lg object-cover"
-                              />
+                               <Image 
+                                 src={item.image || "/placeholder-product.jpg"} 
+                                 alt={item.name}
+                                 width={80}
+                                 height={80}
+                                 className="h-20 w-20 rounded-lg object-cover"
+                               />
                                <div>
                                  <h3 className="font-semibold">{item.name}</h3>
                                  <p className="text-sm text-gray-500">{item.category}</p>

@@ -7,30 +7,31 @@ export default async function ProductsPage() {
   let categories: any[] = [];
   
   try {
-    // Obtener productos de ejemplo (en producción usarías filtros reales)
-    products = await prisma.product.findMany({
-      take: 12,
-      include: {
-        category: true,
-        variants: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    categories = await prisma.category.findMany({
-      where: {
-        parentId: null, // Solo categorías principales
-      },
-      include: {
-        children: {
-          include: {
-            children: true,
+    // Obtener productos y categorías concurrentemente
+    [products, categories] = await Promise.all([
+      prisma.product.findMany({
+        take: 12,
+        include: {
+          category: true,
+          variants: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+      prisma.category.findMany({
+        where: {
+          parentId: null, // Solo categorías principales
+        },
+        include: {
+          children: {
+            include: {
+              children: true,
+            },
           },
         },
-      },
-    });
+      }),
+    ]);
   } catch (error) {
     console.error("Error al cargar productos o categorías:", error);
     // Datos de ejemplo para desarrollo
