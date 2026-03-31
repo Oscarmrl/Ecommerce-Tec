@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,18 +19,6 @@ interface Category {
 
 interface ProductFiltersProps {
   categories: Category[];
-  onFilterChange?: (filters: FilterState) => void;
-}
-
-interface FilterState {
-  category: string | null;
-  priceRange: [number, number];
-  brands: string[];
-  processors: string[];
-  ram: string[];
-  storage: string[];
-  inStock: boolean;
-  featured: boolean;
 }
 
 const BRANDS = ["Apple", "Dell", "HP", "Lenovo", "Asus", "Acer", "MSI"];
@@ -39,77 +26,117 @@ const PROCESSORS = ["Intel Core i5", "Intel Core i7", "Intel Core i9", "AMD Ryze
 const RAM_OPTIONS = ["8GB", "16GB", "32GB", "64GB"];
 const STORAGE_OPTIONS = ["256GB SSD", "512GB SSD", "1TB SSD", "2TB SSD", "1TB HDD", "2TB HDD"];
 
-export default function ProductFilters({ categories, onFilterChange }: ProductFiltersProps) {
-  const [filters, setFilters] = useState<FilterState>({
-    category: null,
-    priceRange: [0, 5000],
-    brands: [],
-    processors: [],
-    ram: [],
-    storage: [],
-    inStock: false,
-    featured: false,
-  });
-
-  const handleFilterChange = (key: keyof FilterState, value: any) => {
-    const newFilters = { ...filters, [key]: value };
-    setFilters(newFilters);
-    onFilterChange?.(newFilters);
+export default function ProductFilters({ categories }: ProductFiltersProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  
+  // Helper to get current values from URL
+  const getCategory = () => searchParams.get('category') || null;
+  const getBrands = () => searchParams.getAll('brand').filter(Boolean);
+  const getProcessors = () => searchParams.getAll('processor').filter(Boolean);
+  const getRam = () => searchParams.getAll('ram').filter(Boolean);
+  const getStorage = () => searchParams.getAll('storage').filter(Boolean);
+  const getMinPrice = () => searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : 0;
+  const getMaxPrice = () => searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : 5000;
+  const getInStock = () => searchParams.get('inStock') === 'true';
+  const getFeatured = () => searchParams.get('featured') === 'true';
+  
+  // Helper to update URL with new parameters
+  const updateURL = (updates: Record<string, string | string[] | number | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    // Remove page param when filters change (reset to page 1)
+    params.delete('page');
+    
+    Object.entries(updates).forEach(([key, value]) => {
+      // Remove existing entries for this key (especially for arrays)
+      params.delete(key);
+      
+      if (value === null || value === undefined || (Array.isArray(value) && value.length === 0)) {
+        // Already deleted, nothing to add
+      } else if (Array.isArray(value)) {
+        value.forEach((item) => params.append(key, item));
+      } else if (typeof value === 'number') {
+        params.set(key, value.toString());
+      } else {
+        params.set(key, value);
+      }
+    });
+    
+    const queryString = params.toString();
+    const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
+    router.replace(newUrl, { scroll: false });
   };
-
+  
+  // Individual filter handlers
+  const handleCategoryChange = (categoryId: string | null) => {
+    updateURL({ category: categoryId });
+  };
+  
   const handleBrandToggle = (brand: string) => {
-    const newBrands = filters.brands.includes(brand)
-      ? filters.brands.filter(b => b !== brand)
-      : [...filters.brands, brand];
-    handleFilterChange("brands", newBrands);
+    const currentBrands = getBrands();
+    const newBrands = currentBrands.includes(brand)
+      ? currentBrands.filter(b => b !== brand)
+      : [...currentBrands, brand];
+    updateURL({ brand: newBrands });
   };
-
+  
   const handleProcessorToggle = (processor: string) => {
-    const newProcessors = filters.processors.includes(processor)
-      ? filters.processors.filter(p => p !== processor)
-      : [...filters.processors, processor];
-    handleFilterChange("processors", newProcessors);
+    const currentProcessors = getProcessors();
+    const newProcessors = currentProcessors.includes(processor)
+      ? currentProcessors.filter(p => p !== processor)
+      : [...currentProcessors, processor];
+    updateURL({ processor: newProcessors });
   };
-
+  
   const handleRamToggle = (ram: string) => {
-    const newRam = filters.ram.includes(ram)
-      ? filters.ram.filter(r => r !== ram)
-      : [...filters.ram, ram];
-    handleFilterChange("ram", newRam);
+    const currentRam = getRam();
+    const newRam = currentRam.includes(ram)
+      ? currentRam.filter(r => r !== ram)
+      : [...currentRam, ram];
+    updateURL({ ram: newRam });
   };
-
+  
   const handleStorageToggle = (storage: string) => {
-    const newStorage = filters.storage.includes(storage)
-      ? filters.storage.filter(s => s !== storage)
-      : [...filters.storage, storage];
-    handleFilterChange("storage", newStorage);
+    const currentStorage = getStorage();
+    const newStorage = currentStorage.includes(storage)
+      ? currentStorage.filter(s => s !== storage)
+      : [...currentStorage, storage];
+    updateURL({ storage: newStorage });
   };
-
+  
+  const handlePriceRangeChange = (range: [number, number]) => {
+    const [min, max] = range;
+    updateURL({ 
+      minPrice: min > 0 ? min : null,
+      maxPrice: max < 5000 ? max : null
+    });
+  };
+  
+  const handleInStockToggle = (checked: boolean) => {
+    updateURL({ inStock: checked ? 'true' : null });
+  };
+  
+  const handleFeaturedToggle = (checked: boolean) => {
+    updateURL({ featured: checked ? 'true' : null });
+  };
+  
   const clearFilters = () => {
-    const clearedFilters: FilterState = {
-      category: null,
-      priceRange: [0, 5000],
-      brands: [],
-      processors: [],
-      ram: [],
-      storage: [],
-      inStock: false,
-      featured: false,
-    };
-    setFilters(clearedFilters);
-    onFilterChange?.(clearedFilters);
+    router.replace(pathname, { scroll: false });
   };
-
+  
+  // Check if any filters are active
   const hasActiveFilters = 
-    filters.category !== null ||
-    filters.priceRange[0] > 0 || filters.priceRange[1] < 5000 ||
-    filters.brands.length > 0 ||
-    filters.processors.length > 0 ||
-    filters.ram.length > 0 ||
-    filters.storage.length > 0 ||
-    filters.inStock ||
-    filters.featured;
-
+    getCategory() !== null ||
+    getMinPrice() > 0 || getMaxPrice() < 5000 ||
+    getBrands().length > 0 ||
+    getProcessors().length > 0 ||
+    getRam().length > 0 ||
+    getStorage().length > 0 ||
+    getInStock() ||
+    getFeatured();
+  
   return (
     <Card className="sticky top-8">
       <CardHeader className="pb-3">
@@ -138,30 +165,30 @@ export default function ProductFilters({ categories, onFilterChange }: ProductFi
           <Label className="text-sm font-medium">Categorías</Label>
           <div className="space-y-2">
             <Button
-              variant={filters.category === null ? "default" : "ghost"}
+              variant={getCategory() === null ? "default" : "ghost"}
               size="sm"
               className="w-full justify-start"
-              onClick={() => handleFilterChange("category", null)}
+              onClick={() => handleCategoryChange(null)}
             >
               Todas las categorías
             </Button>
             {categories.map((category) => (
               <div key={category.id} className="space-y-1">
                 <Button
-                  variant={filters.category === category.id ? "default" : "ghost"}
+                  variant={getCategory() === category.id ? "default" : "ghost"}
                   size="sm"
                   className="w-full justify-start"
-                  onClick={() => handleFilterChange("category", category.id)}
+                  onClick={() => handleCategoryChange(category.id)}
                 >
                   {category.name}
                 </Button>
                 {category.children.map((child) => (
                   <Button
                     key={child.id}
-                    variant={filters.category === child.id ? "default" : "ghost"}
+                    variant={getCategory() === child.id ? "default" : "ghost"}
                     size="sm"
                     className="w-full justify-start pl-8 text-sm"
-                    onClick={() => handleFilterChange("category", child.id)}
+                    onClick={() => handleCategoryChange(child.id)}
                   >
                     {child.name}
                   </Button>
@@ -176,14 +203,14 @@ export default function ProductFilters({ categories, onFilterChange }: ProductFi
         {/* Rango de precio */}
         <div className="space-y-3">
           <Label className="text-sm font-medium">
-            Precio: ${filters.priceRange[0]} - ${filters.priceRange[1]}
+            Precio: ${getMinPrice()} - ${getMaxPrice()}
           </Label>
           <Slider
             min={0}
             max={5000}
             step={100}
-            value={filters.priceRange}
-            onValueChange={(value) => handleFilterChange("priceRange", value)}
+            value={[getMinPrice(), getMaxPrice()]}
+            onValueChange={handlePriceRangeChange}
             className="w-full"
           />
           <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -202,7 +229,7 @@ export default function ProductFilters({ categories, onFilterChange }: ProductFi
               <div key={brand} className="flex items-center space-x-2">
                 <Checkbox
                   id={`brand-${brand}`}
-                  checked={filters.brands.includes(brand)}
+                  checked={getBrands().includes(brand)}
                   onCheckedChange={() => handleBrandToggle(brand)}
                 />
                 <Label
@@ -226,7 +253,7 @@ export default function ProductFilters({ categories, onFilterChange }: ProductFi
               <div key={processor} className="flex items-center space-x-2">
                 <Checkbox
                   id={`processor-${processor}`}
-                  checked={filters.processors.includes(processor)}
+                  checked={getProcessors().includes(processor)}
                   onCheckedChange={() => handleProcessorToggle(processor)}
                 />
                 <Label
@@ -250,7 +277,7 @@ export default function ProductFilters({ categories, onFilterChange }: ProductFi
               <div key={ram} className="flex items-center space-x-2">
                 <Checkbox
                   id={`ram-${ram}`}
-                  checked={filters.ram.includes(ram)}
+                  checked={getRam().includes(ram)}
                   onCheckedChange={() => handleRamToggle(ram)}
                 />
                 <Label
@@ -274,7 +301,7 @@ export default function ProductFilters({ categories, onFilterChange }: ProductFi
               <div key={storage} className="flex items-center space-x-2">
                 <Checkbox
                   id={`storage-${storage}`}
-                  checked={filters.storage.includes(storage)}
+                  checked={getStorage().includes(storage)}
                   onCheckedChange={() => handleStorageToggle(storage)}
                 />
                 <Label
@@ -297,8 +324,8 @@ export default function ProductFilters({ categories, onFilterChange }: ProductFi
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="inStock"
-                checked={filters.inStock}
-                onCheckedChange={(checked: boolean) => handleFilterChange("inStock", checked)}
+                checked={getInStock()}
+                onCheckedChange={handleInStockToggle}
               />
               <Label htmlFor="inStock" className="text-sm font-normal cursor-pointer">
                 Solo en stock
@@ -307,8 +334,8 @@ export default function ProductFilters({ categories, onFilterChange }: ProductFi
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="featured"
-                checked={filters.featured}
-                onCheckedChange={(checked: boolean) => handleFilterChange("featured", checked)}
+                checked={getFeatured()}
+                onCheckedChange={handleFeaturedToggle}
               />
               <Label htmlFor="featured" className="text-sm font-normal cursor-pointer">
                 Solo destacados

@@ -1,5 +1,21 @@
 import ProductCard from "./product-card";
-import { Product } from "@prisma/client";
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  price: string | number;
+  comparePrice?: string | number | null;
+  images: string[];
+  rating?: number | null;
+  featured?: boolean;
+  inventory: number;
+  brand?: string | null;
+  processor?: string | null;
+  ram?: string | null;
+  storage?: string | null;
+}
 
 interface ProductGridProps {
   products: Product[];
@@ -30,8 +46,12 @@ export default function ProductGrid({ products }: ProductGridProps) {
             name: product.name,
             slug: product.slug,
             description: product.description,
-            price: Number(product.price),
-            comparePrice: product.comparePrice ? Number(product.comparePrice) : null,
+            price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+            comparePrice: product.comparePrice 
+              ? (typeof product.comparePrice === 'string' 
+                ? parseFloat(product.comparePrice) 
+                : product.comparePrice)
+              : null,
             images: product.images,
             rating: product.rating,
             featured: product.featured,

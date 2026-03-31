@@ -22,10 +22,10 @@ export async function GET(req: NextRequest) {
     const category = searchParams.get("category");
     const search = searchParams.get("search");
     const featuredParam = searchParams.get("featured");
-    const brand = searchParams.get("brand");
-    const processor = searchParams.get("processor");
-    const ram = searchParams.get("ram");
-    const storage = searchParams.get("storage");
+    const brands = searchParams.getAll("brand");
+    const processors = searchParams.getAll("processor");
+    const ramOptions = searchParams.getAll("ram");
+    const storageOptions = searchParams.getAll("storage");
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const inStockParam = searchParams.get("inStock");
@@ -54,20 +54,20 @@ export async function GET(req: NextRequest) {
       where.featured = featuredParam === "true";
     }
 
-    if (brand) {
-      where.brand = { contains: brand, mode: "insensitive" };
+    if (brands.length > 0) {
+      where.brand = { in: brands };
     }
 
-    if (processor) {
-      where.processor = { contains: processor, mode: "insensitive" };
+    if (processors.length > 0) {
+      where.processor = { in: processors };
     }
 
-    if (ram) {
-      where.ram = { contains: ram, mode: "insensitive" };
+    if (ramOptions.length > 0) {
+      where.ram = { in: ramOptions };
     }
 
-    if (storage) {
-      where.storage = { contains: storage, mode: "insensitive" };
+    if (storageOptions.length > 0) {
+      where.storage = { in: storageOptions };
     }
 
     if (minPrice || maxPrice) {
