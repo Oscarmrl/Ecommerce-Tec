@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { useSession, signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { 
-  ShoppingCart, 
-  Search, 
-  User, 
-  Menu, 
-  X, 
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import {
+  ShoppingCart,
+  Search,
+  User,
+  Menu,
+  X,
   LogOut,
   Settings,
   Package,
-  Heart
-} from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+  Heart,
+} from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,25 +24,24 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useCart } from "@/contexts/cart-context"
+} from "@/components/ui/dropdown-menu";
+import { useCart } from "@/contexts/cart-context";
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { data: session, status } = useSession()
-  const isAuthenticated = status === "authenticated"
-  const isLoading = status === "loading"
-  const { getItemCount } = useCart()
-  const cartItemCount = getItemCount()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated";
+  const isLoading = status === "loading";
+  const { getItemCount } = useCart();
+  const cartItemCount = getItemCount();
 
   const navLinks = [
     { href: "/", label: "Inicio" },
     { href: "/products", label: "Productos" },
     { href: "/categories", label: "Categorías" },
-    { href: "/deals", label: "Ofertas" },
     { href: "/about", label: "Nosotros" },
     { href: "/contact", label: "Contacto" },
-  ]
+  ];
 
   const categories = [
     "Smartphones",
@@ -53,7 +52,7 @@ export default function Navbar() {
     "Accesorios",
     "Gaming",
     "Smart Home",
-  ]
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-soft bg-surface-0/95 backdrop-blur-lg supports-[backdrop-filter]:bg-surface-0/80 transition-smooth">
@@ -61,30 +60,36 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Button variant="ghost" className="p-0 hover:bg-transparent" asChild>
-               <Link href="/" className="flex items-center gap-3 group">
-                 <div className="relative h-9 w-9 rounded-lg gradient-tech-primary overflow-hidden group-hover:glow-primary transition-smooth">
-                   <div className="absolute inset-0 circuit-pattern-intense" />
-                   <div className="absolute inset-0 flex items-center justify-center">
-                     <div className="h-5 w-5 rounded-sm bg-white/90" />
-                   </div>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                     TechStore
-                   </span>
-                   <span className="text-xs text-tertiary tracking-wider font-mono">TECHNOLOGY</span>
-                 </div>
-               </Link>
+            <Button
+              variant="ghost"
+              className="p-0 hover:bg-transparent"
+              asChild
+            >
+              <Link href="/" className="flex items-center gap-3 group">
+                <div className="relative h-9 w-9 rounded-lg gradient-tech-primary overflow-hidden group-hover:glow-primary transition-smooth">
+                  <div className="absolute inset-0 circuit-pattern-intense" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="h-5 w-5 rounded-sm bg-white/90" />
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    TechStore
+                  </span>
+                  <span className="text-xs text-tertiary tracking-wider font-mono">
+                    TECHNOLOGY
+                  </span>
+                </div>
+              </Link>
             </Button>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => (
-              <Button 
-                key={link.href} 
-                variant="ghost" 
+              <Button
+                key={link.href}
+                variant="ghost"
                 className="relative px-4 py-2 text-sm font-medium text-secondary hover:text-primary rounded-lg hover:bg-surface-1 transition-smooth group"
                 asChild
               >
@@ -99,8 +104,8 @@ export default function Navbar() {
           {/* Actions */}
           <div className="flex items-center gap-1">
             <div className="relative">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
                 className="rounded-lg hover:bg-surface-1 text-tertiary hover:text-primary transition-smooth"
               >
@@ -117,13 +122,13 @@ export default function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative">
                     {session?.user?.image ? (
-                       <Image
-                         src={session.user.image}
-                         alt={session.user.name || "Usuario"}
-                         width={24}
-                         height={24}
-                         className="h-6 w-6 rounded-full"
-                       />
+                      <Image
+                        src={session.user.image}
+                        alt={session.user.name || "Usuario"}
+                        width={24}
+                        height={24}
+                        className="h-6 w-6 rounded-full"
+                      />
                     ) : (
                       <User className="h-5 w-5" />
                     )}
@@ -166,7 +171,7 @@ export default function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     className="cursor-pointer text-red-600 focus:text-red-600"
                     onClick={() => signOut({ callbackUrl: "/" })}
                   >
@@ -182,8 +187,8 @@ export default function Navbar() {
                 </Link>
               </Button>
             )}
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="relative rounded-lg hover:bg-surface-1 text-tertiary hover:text-primary transition-smooth group"
               asChild
@@ -204,7 +209,11 @@ export default function Navbar() {
               className="md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </Button>
           </div>
         </div>
@@ -213,9 +222,9 @@ export default function Navbar() {
         <div className="hidden md:flex items-center justify-between py-3 border-t border-soft">
           <div className="flex items-center gap-2 overflow-x-auto">
             {categories.map((category) => (
-              <Button 
-                key={category} 
-                variant="ghost" 
+              <Button
+                key={category}
+                variant="ghost"
                 size="sm"
                 className="px-3 py-1.5 text-xs font-medium text-tertiary hover:text-primary hover:bg-surface-1 rounded-md transition-smooth border border-transparent hover:border-soft"
                 asChild
@@ -227,7 +236,8 @@ export default function Navbar() {
             ))}
           </div>
           <div className="text-xs font-medium text-tertiary tracking-wide">
-            <span className="text-primary font-semibold">ENVÍO GRATIS</span> en pedidos &gt; $500
+            <span className="text-primary font-semibold">ENVÍO GRATIS</span> en
+            pedidos &gt; $500
           </div>
         </div>
 
@@ -236,14 +246,21 @@ export default function Navbar() {
           <div className="md:hidden border-t py-4">
             <div className="flex flex-col space-y-2">
               {navLinks.map((link) => (
-                <Button key={link.href} variant="ghost" className="justify-start" asChild>
+                <Button
+                  key={link.href}
+                  variant="ghost"
+                  className="justify-start"
+                  asChild
+                >
                   <Link href={link.href} onClick={() => setIsMenuOpen(false)}>
                     {link.label}
                   </Link>
                 </Button>
               ))}
               <div className="pt-4 border-t">
-                <h4 className="px-4 py-2 text-sm font-semibold text-gray-500">Categorías</h4>
+                <h4 className="px-4 py-2 text-sm font-semibold text-gray-500">
+                  Categorías
+                </h4>
                 <div className="grid grid-cols-2 gap-2 px-4">
                   {categories.map((category) => (
                     <Button
@@ -268,5 +285,5 @@ export default function Navbar() {
         )}
       </div>
     </header>
-  )
+  );
 }
