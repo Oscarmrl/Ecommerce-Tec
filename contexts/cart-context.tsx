@@ -432,9 +432,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         // Eliminar todos los items uno por uno (la API no tiene clear)
         for (const item of items) {
-          await fetchApi(`/api/cart?itemId=${item.id}`, {
-            method: "DELETE",
-          });
+          try {
+            await fetchApi(`/api/cart?itemId=${item.id}`, {
+              method: "DELETE",
+            });
+          } catch (err: any) {
+            // Si el item ya no existe en el servidor (por ejemplo, ya fue eliminado al crear la orden),
+            // ignoramos el error y continuamos.
+            if (err.message.includes("no encontrado") || err.message.includes("not found")) {
+              console.log(`Item ${item.id} ya eliminado en servidor, ignorando error.`);
+              continue;
+            }
+            // Para otros errores, relanzamos
+            throw err;
+          }
         }
         setItems([]);
       } catch (err: any) {

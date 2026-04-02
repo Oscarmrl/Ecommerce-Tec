@@ -91,10 +91,10 @@ async function getCart(req: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            error: "Usuario no encontrado",
-            message: "El usuario no existe en la base de datos",
+            error: "Sesión inválida",
+            message: "La sesión del usuario no es válida. Por favor, inicia sesión nuevamente.",
           },
-          { status: 404 },
+          { status: 401 },
         );
       }
 
@@ -291,10 +291,10 @@ async function addToCart(req: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            error: "Usuario no encontrado",
-            message: "El usuario no existe en la base de datos",
+            error: "Sesión inválida",
+            message: "La sesión del usuario no es válida. Por favor, inicia sesión nuevamente.",
           },
-          { status: 404 },
+          { status: 401 },
         );
       }
 

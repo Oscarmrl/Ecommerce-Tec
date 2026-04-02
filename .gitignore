@@ -44,3 +44,5 @@ next-env.d.ts
 cookies.txt
 *.js
 *.json
+.agents
+.playwright-mcp

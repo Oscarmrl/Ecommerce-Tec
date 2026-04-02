@@ -44,7 +44,7 @@ export async function getServerSession() {
 export async function checkAuth(requiredRole: UserRole = "USER") {
   const session = await getServerSession();
 
-  if (!session?.user) {
+  if (!session?.user || !(session.user as any).id) {
     return {
       authorized: false,
       error: "No autenticado",

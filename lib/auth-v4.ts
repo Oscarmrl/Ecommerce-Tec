@@ -141,6 +141,23 @@ export const authOptions: AuthOptions = {
         }
       }
 
+      // Validar que el usuario existe en la base de datos
+      if (token.id && token.id !== "undefined") {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { id: true },
+        });
+        if (!dbUser) {
+          // Usuario eliminado o no existe, invalidar el token
+          (token as any).id = undefined;
+          (token as any).email = undefined;
+          (token as any).name = undefined;
+          (token as any).picture = undefined;
+          (token as any).role = undefined;
+          (token as any).provider = undefined;
+        }
+      }
+
       return token;
     },
 
