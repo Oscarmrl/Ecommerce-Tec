@@ -37,7 +37,23 @@ export async function GET(req: NextRequest) {
     // Construir filtros
     const where: Prisma.ProductWhereInput = {};
 
-    if (category) where.categoryId = category;
+    // Filtrar por categoría (acepta slug o ID)
+    if (category) {
+      // Buscar categoría por ID o slug
+      const categoryRecord = await prisma.category.findFirst({
+        where: {
+          OR: [
+            { id: category },
+            { slug: category }
+          ]
+        }
+      });
+      // Si se encuentra la categoría, filtrar por su ID; si no, ignorar el filtro (mostrar todos los productos)
+      if (categoryRecord) {
+        where.categoryId = categoryRecord.id;
+      }
+      // Si no se encuentra la categoría, no se aplica filtro (where.categoryId no se establece)
+    }
 
     if (search) {
       where.OR = [

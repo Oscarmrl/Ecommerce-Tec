@@ -172,29 +172,29 @@ export default function ProductFilters({ categories }: ProductFiltersProps) {
             >
               Todas las categorías
             </Button>
-            {categories.map((category) => (
-              <div key={category.id} className="space-y-1">
-                <Button
-                  variant={getCategory() === category.id ? "default" : "ghost"}
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={() => handleCategoryChange(category.id)}
-                >
-                  {category.name}
-                </Button>
-                {category.children.map((child) => (
-                  <Button
-                    key={child.id}
-                    variant={getCategory() === child.id ? "default" : "ghost"}
-                    size="sm"
-                    className="w-full justify-start pl-8 text-sm"
-                    onClick={() => handleCategoryChange(child.id)}
-                  >
-                    {child.name}
-                  </Button>
-                ))}
-              </div>
-            ))}
+             {categories.map((category) => (
+               <div key={category.id} className="space-y-1">
+                 <Button
+                   variant={getCategory() === category.slug ? "default" : "ghost"}
+                   size="sm"
+                   className="w-full justify-start"
+                   onClick={() => handleCategoryChange(category.slug)}
+                 >
+                   {category.name}
+                 </Button>
+                 {category.children.map((child) => (
+                   <Button
+                     key={child.id}
+                     variant={getCategory() === child.slug ? "default" : "ghost"}
+                     size="sm"
+                     className="w-full justify-start pl-8 text-sm"
+                     onClick={() => handleCategoryChange(child.slug)}
+                   >
+                     {child.name}
+                   </Button>
+                 ))}
+               </div>
+             ))}
           </div>
         </div>
 

@@ -1,6 +1,8 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GradientButton } from "@/components/ui/gradient-button";
+import FeaturedProductCard from "@/components/products/featured-product-card";
 import {
   ShoppingCart,
   Smartphone,
@@ -27,16 +29,35 @@ export default async function HomePage() {
     const featuredProductsFromDb = await prisma.product.findMany({
       where: { featured: true },
       take: 4,
-      include: { category: true },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        price: true,
+        images: true,
+        inventory: true,
+        rating: true,
+        featured: true,
+        brand: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     featuredProducts = featuredProductsFromDb.map((product, index) => ({
       id: product.id,
       name: product.name,
+      slug: product.slug,
       price: Number(product.price),
-      image: product.images?.[0] || PLACEHOLDER_IMG,
-      category: product.category?.name || "Computadoras",
+      images: product.images,
+      inventory: product.inventory,
       rating: product.rating || 4.5,
+      brand: product.brand,
+      featured: product.featured,
+      category: product.category?.name || "Computadoras",
       isNew: index < 2, // demo
       discount: index === 0 ? 10 : index === 2 ? 15 : 0, // demo
     }));
@@ -45,7 +66,10 @@ export default async function HomePage() {
     const categoriesFromDb = await prisma.category.findMany({
       where: { parentId: null },
       take: 4,
-      include: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
         _count: {
           select: { products: true },
         },
@@ -53,7 +77,9 @@ export default async function HomePage() {
     });
 
     categories = categoriesFromDb.map((category, index) => ({
+      id: category.id,
       name: category.name,
+      slug: category.slug,
       icon:
         [Smartphone, Laptop, Headphones, ShoppingCart][index] || ShoppingCart,
       count: category._count.products,
@@ -62,10 +88,10 @@ export default async function HomePage() {
     // Si no hay suficientes categorías, completa con defaults (solo estructura visual)
     if (categories.length < 4) {
       const defaultCategories = [
-        { name: "Smartphones", icon: Smartphone, count: 0 },
-        { name: "Laptops", icon: Laptop, count: 0 },
-        { name: "Audio", icon: Headphones, count: 0 },
-        { name: "Accessories", icon: ShoppingCart, count: 0 },
+        { name: "Smartphones", slug: "smartphones", icon: Smartphone, count: 0 },
+        { name: "Laptops", slug: "laptops", icon: Laptop, count: 0 },
+        { name: "Accesorios", slug: "accesorios", icon: Headphones, count: 0 },
+        { name: "Componentes", slug: "componentes", icon: ShoppingCart, count: 0 },
       ];
       for (let i = categories.length; i < 4; i++) {
         categories.push(defaultCategories[i]);
@@ -82,10 +108,10 @@ export default async function HomePage() {
     // Mantener UI bonita pero sin mentir: sin productos, categorías “vacías”
     dataStatus = "error";
     categories = [
-      { name: "Smartphones", icon: Smartphone, count: 0 },
-      { name: "Laptops", icon: Laptop, count: 0 },
-      { name: "Audio", icon: Headphones, count: 0 },
-      { name: "Accessories", icon: ShoppingCart, count: 0 },
+      { name: "Smartphones", slug: "smartphones", icon: Smartphone, count: 0 },
+      { name: "Laptops", slug: "laptops", icon: Laptop, count: 0 },
+      { name: "Accesorios", slug: "accesorios", icon: Headphones, count: 0 },
+      { name: "Componentes", slug: "componentes", icon: ShoppingCart, count: 0 },
     ];
     featuredProducts = [];
   }
@@ -146,15 +172,17 @@ export default async function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <GradientButton
-              size="lg"
-              className="px-8 py-3 rounded-lg hover-lift glow-primary transition-smooth group"
-            >
-              <Sparkles className="w-5 h-5 mr-2 transition-transform group-hover:rotate-12" />
-              <span className="font-semibold tracking-wide">
-                Explorar Catálogo
-              </span>
-            </GradientButton>
+            <Link href="/products">
+              <GradientButton
+                size="lg"
+                className="px-8 py-3 rounded-lg hover-lift glow-primary transition-smooth group"
+              >
+                <Sparkles className="w-5 h-5 mr-2 transition-transform group-hover:rotate-12" />
+                <span className="font-semibold tracking-wide">
+                  Explorar Catálogo
+                </span>
+              </GradientButton>
+            </Link>
             <Button
               size="lg"
               variant="outline"
@@ -287,9 +315,11 @@ export default async function HomePage() {
               ];
 
               return (
-                <div
-                  key={category.name}
-                  className="group relative overflow-hidden rounded-xl border border-soft bg-surface-0 hover:border-primary/40 hover-lift transition-smooth"
+                <Link
+                  key={category.slug}
+                  href={`/products?category=${category.slug}`}
+                  className="block group relative overflow-hidden rounded-xl border border-soft bg-surface-0 hover:border-primary/40 hover-lift transition-smooth"
+                  aria-label={`Explorar categoría ${category.name}`}
                 >
                   <div
                     className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
@@ -325,7 +355,7 @@ export default async function HomePage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -351,13 +381,15 @@ export default async function HomePage() {
                 valoraciones
               </p>
             </div>
-            <Button
-              variant="outline"
-              className="border-strong text-primary hover:bg-surface-1 hover:border-primary hover-lift transition-smooth px-6"
-            >
-              <span className="font-semibold">Ver Catálogo Completo</span>
-              <div className="ml-2 h-4 w-4 border-r-2 border-b-2 border-current transform rotate-[-45deg]" />
-            </Button>
+            <Link href="/products">
+              <Button
+                variant="outline"
+                className="border-strong text-primary hover:bg-surface-1 hover:border-primary hover-lift transition-smooth px-6"
+              >
+                <span className="font-semibold">Ver Catálogo Completo</span>
+                <div className="ml-2 h-4 w-4 border-r-2 border-b-2 border-current transform rotate-[-45deg]" />
+              </Button>
+            </Link>
           </div>
 
           {/* ✅ Cambio: si no hay productos reales, mostramos mensaje honesto */}
@@ -374,120 +406,9 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredProducts.map((product: any, index: number) => {
-                const gradients = [
-                  "from-primary/20 to-primary/5",
-                  "from-secondary/20 to-secondary/5",
-                  "from-accent/20 to-accent/5",
-                  "from-primary/20 to-accent/5",
-                ];
-
-                const accentColors = [
-                  "bg-primary text-primary-foreground hover:bg-primary-dark",
-                  "bg-secondary text-secondary-foreground hover:bg-secondary-dark",
-                  "bg-accent text-accent-foreground hover:bg-accent-dark",
-                  "bg-primary text-primary-foreground hover:bg-primary-dark",
-                ];
-
-                return (
-                  <div
-                    key={product.id}
-                    className="group relative overflow-hidden rounded-xl border border-soft bg-surface-0 hover:border-primary/40 hover-lift transition-smooth"
-                  >
-                    {/* Product Image Area */}
-                    <div className="relative aspect-square bg-gradient-to-br from-surface-1 to-surface-0 overflow-hidden">
-                      {/* Product Image */}
-                      <div className="absolute inset-0">
-                         <Image
-                           src={product.image || PLACEHOLDER_IMG}
-                           alt={product.name}
-                           fill
-                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                           className="object-cover group-hover:scale-105 transition-transform duration-300"
-                         />
-                        <div
-                          className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
-                        />
-                      </div>
-
-                      {/* Status Badges */}
-                      <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
-                        {product.isNew && (
-                          <div className="px-2 py-1 rounded-full bg-primary text-xs font-semibold text-primary-foreground shadow-sm">
-                            NUEVO
-                          </div>
-                        )}
-                        {product.discount > 0 && (
-                          <div className="px-2 py-1 rounded-full bg-accent text-xs font-semibold text-accent-foreground shadow-sm">
-                            -{product.discount}%
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Rating */}
-                      <div className="absolute top-3 right-3 flex items-center gap-1 bg-surface-0/90 backdrop-blur-sm px-2 py-1 rounded-full border border-soft z-10">
-                        <Star className="w-3 h-3 fill-primary text-primary" />
-                        <span className="text-xs font-semibold text-primary">
-                          {product.rating}
-                        </span>
-                      </div>
-
-                      {/* Quick Action */}
-                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                        <Button
-                          size="sm"
-                          className={`${accentColors[index]} rounded-full px-4 shadow-md hover-lift`}
-                        >
-                          <ShoppingCart className="w-3 h-3 mr-2" />
-                          Agregar
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="p-5">
-                      <div className="mb-3">
-                        <div className="text-xs font-medium text-tertiary mb-1">
-                          {product.category}
-                        </div>
-                        <h3 className="font-semibold text-lg text-primary group-hover:text-primary-dark transition-colors">
-                          {product.name}
-                        </h3>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-4 border-t border-soft">
-                        <div>
-                          {product.discount > 0 ? (
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-2xl font-bold text-primary">
-                                $
-                                {product.price -
-                                  (product.price * product.discount) / 100}
-                              </span>
-                              <span className="text-sm text-tertiary line-through">
-                                ${product.price}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-2xl font-bold text-primary">
-                              ${product.price}
-                            </span>
-                          )}
-                        </div>
-
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-tertiary hover:text-primary hover:bg-surface-1 rounded-lg"
-                        >
-                          <span className="text-xs font-medium">Detalles</span>
-                          <div className="ml-1 h-3 w-3 border-r-2 border-b-2 border-current transform rotate-[-45deg]" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {featuredProducts.map((product: any, index: number) => (
+                <FeaturedProductCard key={product.id} product={product} index={index} />
+              ))}
             </div>
           )}
         </div>
@@ -521,15 +442,17 @@ export default async function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <GradientButton
-              size="lg"
-              className="px-10 py-4 rounded-xl hover-lift glow-primary transition-slower group"
-            >
-              <ShoppingCart className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
-              <span className="font-bold tracking-wider">
-                COMENZAR A COMPRAR
-              </span>
-            </GradientButton>
+            <Link href="/products">
+              <GradientButton
+                size="lg"
+                className="px-10 py-4 rounded-xl hover-lift glow-primary transition-slower group"
+              >
+                <ShoppingCart className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
+                <span className="font-bold tracking-wider">
+                  COMENZAR A COMPRAR
+                </span>
+              </GradientButton>
+            </Link>
 
             <Button
               size="lg"

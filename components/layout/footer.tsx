@@ -4,12 +4,11 @@ import { Facebook, Twitter, Instagram, Youtube, CreditCard, Truck, Shield, Headp
 
 export default function Footer() {
   const footerLinks = {
-    Productos: [
-      { label: "Smartphones", href: "/categories/smartphones" },
-      { label: "Laptops", href: "/categories/laptops" },
-      { label: "Tablets", href: "/categories/tablets" },
-      { label: "Audio", href: "/categories/audio" },
-      { label: "Wearables", href: "/categories/wearables" },
+     Productos: [
+      { label: "Laptops", href: "/products?category=laptops" },
+      { label: "Smartphones", href: "/products?category=smartphones" },
+      { label: "Accesorios", href: "/products?category=accesorios" },
+      { label: "Componentes", href: "/products?category=componentes" },
     ],
     "Sobre Nosotros": [
       { label: "Nuestra Historia", href: "/about" },

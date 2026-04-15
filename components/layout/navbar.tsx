@@ -38,20 +38,15 @@ export default function Navbar() {
   const navLinks = [
     { href: "/", label: "Inicio" },
     { href: "/products", label: "Productos" },
-    { href: "/categories", label: "Categorías" },
     { href: "/about", label: "Nosotros" },
     { href: "/contact", label: "Contacto" },
   ];
 
   const categories = [
-    "Smartphones",
-    "Laptops",
-    "Tablets",
-    "Audio",
-    "Wearables",
-    "Accesorios",
-    "Gaming",
-    "Smart Home",
+    { name: "Laptops", slug: "laptops" },
+    { name: "Smartphones", slug: "smartphones" },
+    { name: "Accesorios", slug: "accesorios" },
+    { name: "Componentes", slug: "componentes" },
   ];
 
   return (
@@ -223,14 +218,14 @@ export default function Navbar() {
           <div className="flex items-center gap-2 overflow-x-auto">
             {categories.map((category) => (
               <Button
-                key={category}
+                key={category.slug}
                 variant="ghost"
                 size="sm"
                 className="px-3 py-1.5 text-xs font-medium text-tertiary hover:text-primary hover:bg-surface-1 rounded-md transition-smooth border border-transparent hover:border-soft"
                 asChild
               >
-                <Link href={`/categories/${category.toLowerCase()}`}>
-                  {category}
+                <Link href={`/products?category=${category.slug}`}>
+                  {category.name}
                 </Link>
               </Button>
             ))}
@@ -261,24 +256,24 @@ export default function Navbar() {
                 <h4 className="px-4 py-2 text-sm font-semibold text-gray-500">
                   Categorías
                 </h4>
-                <div className="grid grid-cols-2 gap-2 px-4">
-                  {categories.map((category) => (
-                    <Button
-                      key={category}
-                      variant="outline"
-                      size="sm"
-                      className="justify-start"
-                      asChild
-                    >
-                      <Link
-                        href={`/categories/${category.toLowerCase()}`}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {category}
-                      </Link>
-                    </Button>
-                  ))}
-                </div>
+                 <div className="grid grid-cols-2 gap-2 px-4">
+                   {categories.map((category) => (
+                     <Button
+                       key={category.slug}
+                       variant="outline"
+                       size="sm"
+                       className="justify-start"
+                       asChild
+                     >
+                       <Link
+                         href={`/products?category=${category.slug}`}
+                         onClick={() => setIsMenuOpen(false)}
+                       >
+                         {category.name}
+                       </Link>
+                     </Button>
+                   ))}
+                 </div>
               </div>
             </div>
           </div>
