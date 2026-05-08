@@ -114,18 +114,21 @@ model Review {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  name      String?
-  image     String?
-  phone     String?
-  password  String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  role      String    @default("USER")
-  addresses Address[]
-  carts     Cart[]
-  orders    Order[]
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String?
+  image          String?
+  phone          String?
+  password       String?
+  isActive       Boolean   @default(true)
+  emailVerified  DateTime?
+  lastLogin      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  role           String    @default("USER")
+  addresses      Address[]
+  carts          Cart[]
+  orders         Order[]
 
   @@map("users")
 }

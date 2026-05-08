@@ -15,6 +15,7 @@ import {
   Settings,
   Package,
   Heart,
+  Shield,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -26,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useCart } from "@/contexts/cart-context";
+import { checkClientRole } from "@/lib/client-auth-utils";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,6 +36,7 @@ export default function Navbar() {
   const isLoading = status === "loading";
   const { getItemCount } = useCart();
   const cartItemCount = getItemCount();
+  const isAdmin = checkClientRole(session?.user?.role, "ADMIN");
 
   const navLinks = [
     { href: "/", label: "Inicio" },
@@ -165,6 +168,19 @@ export default function Navbar() {
                       Configuración
                     </Link>
                   </DropdownMenuItem>
+                  
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin" className="cursor-pointer">
+                          <Shield className="mr-2 h-4 w-4" />
+                          Panel de Administración
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="cursor-pointer text-red-600 focus:text-red-600"
