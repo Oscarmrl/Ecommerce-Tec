@@ -22,6 +22,7 @@ interface CartContextType {
   removeItem: (id: string) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
+  clearCartLocal: () => void;
   getItemCount: () => number;
   getTotalPrice: () => number;
   isLoading: boolean;
@@ -459,6 +460,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const clearCartLocal = () => {
+    setItems([]);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("cart");
+    }
+  };
+
   const getItemCount = () => {
     return items.reduce((total, item) => total + item.quantity, 0);
   };
@@ -475,6 +483,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         removeItem,
         updateQuantity,
         clearCart,
+        clearCartLocal,
         getItemCount,
         getTotalPrice,
         isLoading,

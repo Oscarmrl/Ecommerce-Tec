@@ -27,7 +27,7 @@ interface Address {
 export default function CheckoutPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { items, getTotalPrice, clearCart, isLoading: cartLoading } = useCart();
+  const { items, getTotalPrice, clearCart, clearCartLocal, isLoading: cartLoading } = useCart();
   
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
@@ -154,7 +154,7 @@ export default function CheckoutPage() {
       
       if (data.success) {
         toast.success("¡Orden creada exitosamente!");
-        await clearCart();
+        clearCartLocal(); // El servidor ya borró los items al crear la orden
         router.push(`/orders/${data.data.id}`);
       } else {
         toast.error(data.error || "Error al crear la orden");
