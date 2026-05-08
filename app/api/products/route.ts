@@ -13,6 +13,38 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
+    // Si se proporciona un ID, devolver un solo producto
+    const productId = searchParams.get("id");
+    if (productId) {
+      const product = await prisma.product.findUnique({
+        where: { id: productId },
+        include: {
+          category: { select: { id: true, name: true, slug: true } },
+          variants: true,
+        },
+      });
+
+      if (!product) {
+        return NextResponse.json(
+          { success: false, error: "Producto no encontrado" },
+          { status: 404 },
+        );
+      }
+
+      // Formatear Decimal a string
+      const formattedProduct = {
+        ...product,
+        price: product.price.toString(),
+        comparePrice: product.comparePrice?.toString() ?? null,
+      };
+
+      return NextResponse.json({
+        success: true,
+        data: formattedProduct,
+      });
+    }
+
+    // Listado paginado
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(
       50,
